@@ -1,10 +1,29 @@
-# python-project
+# aws-discovery
 
-Sample project for Python components.
+This tool generates a comprehensive table with all AWS resources and their
+ARN. This might be useful to create a resource map of all the things currently
+configured on a AWS account.
 
-This repository is a template for Python packages. Code it, change it, break
-it, fix it, test it, use it, throw it, rename it.
+## What does this tool do?
 
-## How to create a repository
+It checks all major services (or, at least, those ones I'm currently working
+on. There's more, I know. If this almost suit your needs, I'd be more than
+happy to review your PR :sunglasses:) and build a CSV with all resources it
+finds.
 
-Click here: https://github.com/giovannicuriel/python-project/generate
+## How to run
+
+First, install all of its dependencies:
+
+```bash
+pipenv install
+```
+
+And then run it.
+
+```bash
+pipenv run python3 ./awsdiscovery/main.py
+```
+
+Wait a little bit (depending on the number of resources, it might take a while
+to gather all information) and it will print all the resources it found.
