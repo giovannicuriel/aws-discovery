@@ -3,7 +3,7 @@ import json
 
 resource_map = {}
 
-def update_resource_mapping(resource_type, resource_id, stack_id, status=None):
+def update_resource_mapping(resource_type, resource_id, stack_id, status=None, extra=None):
     if not resource_type in resource_map:
         resource_map[resource_type] = {}
     
@@ -13,9 +13,12 @@ def update_resource_mapping(resource_type, resource_id, stack_id, status=None):
     if not 'parent_stack' in resource_map[resource_type][resource_id]:
         resource_map[resource_type][resource_id]['parent_stack'] = stack_id
         resource_map[resource_type][resource_id]['resource_status'] = status    
+        resource_map[resource_type][resource_id]['extra'] = extra
     elif resource_map[resource_type][resource_id]['parent_stack'] is None:
         resource_map[resource_type][resource_id]['parent_stack'] = stack_id
         resource_map[resource_type][resource_id]['resource_status'] = status
+        resource_map[resource_type][resource_id]['extra'] = extra
+        
 
 def update_stack_resource_map(result, stack_id):
     for resource in result['StackResourceSummaries']:
@@ -67,6 +70,16 @@ def build_apigateway_entries():
         update_resource_mapping('AWS::ApiGateway::ApiKey', resource['id'], None, 'CREATE_COMPLETE')
     
 
+def build_cloudfront_entries():
+    print('Retrieving CloudFront resources')
+    client = boto3.client('cloudfront')
+    resource_list = client.list_distributions()
+    for resource in resource_list['DistributionList']['Items']:
+        print('Checking distribution {}'.format(resource['Id']))
+        update_resource_mapping('AWS::CloudFormation::Distribution', resource['Id'], None, 'CREATE_COMPLETE')
+        for origin in resource['Origins']['Items']:
+            update_resource_mapping('AWS::CloudFormation::Distribution::Origin', origin['Id'], resource['Id'], 'CREATE_COMPLETE')
+
 def generate_csv(resource_map):
     """
     Generate a CSV-style output given resource map
@@ -79,5 +92,6 @@ def generate_csv(resource_map):
 
 # build_cloudformation_entries()
 # build_s3_entries()
-build_apigateway_entries()
+# build_apigateway_entries()
+build_cloudfront_entries()
 generate_csv(resource_map)
