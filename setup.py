@@ -11,20 +11,19 @@ with io.open('README.md', 'rt', encoding='utf8') as f:
     README = f.read()
 
 setup(
-    name='SampleModule',
+    name='aws-discovery',
     version='1.0.0',
-    url='http://github.com/giovannicuriel/python-project',
+    url='http://github.com/giovannicuriel/aws-discovery',
     project_urls=OrderedDict((
-        ('Code', 'https://github.com/giovannicuriel/python-project.git'),
-        ('Issue tracker', 'https://github.com/giovannicuriel/python-project/issues'),
+        ('Code', 'https://github.com/giovannicuriel/aws-discovery.git'),
+        ('Issue tracker', 'https://github.com/giovannicuriel/aws-discovery/issues'),
     )),
     license='BSD-3-Clause',
     author='Giovanni Curiel dos Santos',
     author_email='giovannicuriel@gmail.com',
-    maintainer='dojot team',
-    description='Sample project structure for Python modules',
+    description='Tool to gather all configured AWS resources',
     long_description=README,
-    packages=["sample_package"],
+    packages=["awsdiscovery"],
     include_package_data=True,
     zip_safe=False,
     platforms=[any],
@@ -34,12 +33,12 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'super_package==1.0.0'
+        'boto3==1.9.218'
     ],
     extras_require={
         "dev": [
-            "pytest==4.0.0",
-            "pytest-cov==2.6.0"
+            "Sphinx==2.2.0",
+            "pylint==2.3.1"
         ]
     }
 )
