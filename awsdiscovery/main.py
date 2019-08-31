@@ -80,18 +80,29 @@ def build_cloudfront_entries():
         for origin in resource['Origins']['Items']:
             update_resource_mapping('AWS::CloudFormation::Distribution::Origin', origin['Id'], resource['Id'], 'CREATE_COMPLETE')
 
+def build_dynamodb_entries():
+    print('Retrieving DynamoDB resources')
+    client = boto3.client('dynamodb')
+    resource_list = client.list_tables()
+    for resource in resource_list['TableNames']:
+        print('Checking table {}'.format(resource))
+        update_resource_mapping('AWS::DynamoDB::Table', resource, None, 'CREATE_COMPLETE')
+
 def generate_csv(resource_map):
     """
     Generate a CSV-style output given resource map
     """
-    print('resource_type, resource_id, parent_stack, resource_status')
+    file = open('./output.csv', 'w')
+    file.write('resource_type, resource_id, parent_stack, resource_status\n')
     for resource_type in resource_map:
         for resource_id in resource_map[resource_type]:
             resource = resource_map[resource_type][resource_id]
-            print(f'{resource_type}, {resource_id}, {resource["parent_stack"]}, {resource["resource_status"]}')
+            file.write(f'{resource_type}, {resource_id}, {resource["parent_stack"]}, {resource["resource_status"]}\n')
+    file.close()
 
-# build_cloudformation_entries()
-# build_s3_entries()
-# build_apigateway_entries()
+build_cloudformation_entries()
+build_s3_entries()
+build_apigateway_entries()
 build_cloudfront_entries()
+build_dynamodb_entries()
 generate_csv(resource_map)
