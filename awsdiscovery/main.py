@@ -88,6 +88,37 @@ def build_dynamodb_entries():
         print('Checking table {}'.format(resource))
         update_resource_mapping('AWS::DynamoDB::Table', resource, None, 'CREATE_COMPLETE')
 
+def build_secretsmanager_entries():
+    print('Retrieving SecretsManager resources')
+    client = boto3.client('secretsmanager')
+    results = client.list_secrets()
+    print('There are {} secrets.'.format(len(results['SecretList'])))
+    for item in results['SecretList']:
+        update_resource_mapping('AWS::SecretsManager::Secret', item['ARN'], None, 'CREATE_COMPLETED', item['Name'])
+    next_token = results['NextToken'] if 'NextToken' in results else None
+    while next_token != None:
+        results = client.list_secrets(NextToken=next_token)
+        print('There are more {} secrets.'.format(len(results['SecretList'])))
+        for item in results['SecretList']:
+            update_resource_mapping('AWS::SecretsManager::Secret', item['ARN'], None, 'CREATE_COMPLETED', item['Name'])
+        next_token = results['NextToken'] if 'NextToken' in results else None
+
+def build_ecs_entries():
+    print('Retrieving ECS resources')
+    client = boto3.client('ecs')
+    results = client.list_clusters()
+    print('There are {} clusters.'.format(len(results['clusterArns'])))
+    for item in results['clusterArns']:
+        update_resource_mapping('AWS::ECS::Cluster', item, None, 'CREATE_COMPLETED')
+    next_token = results['nextToken'] if 'nextToken' in results else None
+    while next_token != None:
+        results = client.list_clusters(nextToken=next_token)
+        print('There are more {} clusters.'.format(len(results['clusterArns'])))
+        for item in results['clusterArns']:
+            update_resource_mapping('AWS::ECS::Cluster', item, None, 'CREATE_COMPLETED')
+        next_token = results['nextToken'] if 'nextToken' in results else None
+
+
 def generate_csv(resource_map):
     """
     Generate a CSV-style output given resource map
@@ -105,4 +136,6 @@ build_s3_entries()
 build_apigateway_entries()
 build_cloudfront_entries()
 build_dynamodb_entries()
+build_secretsmanager_entries()
+build_ecs_entries()
 generate_csv(resource_map)
