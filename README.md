@@ -22,7 +22,12 @@ pipenv install
 And then run it.
 
 ```bash
-pipenv run python3 ./awsdiscovery/main.py
+pipenv shell
+python3 -m awsdiscovery.main
+# OR
+# This will list all of your repositories and their number of branches
+# Useful to detect empty repository ;)
+python3 -m awsdiscovery.codecommit us-east-1
 ```
 
 Wait a little bit (depending on the number of resources, it might take a while
